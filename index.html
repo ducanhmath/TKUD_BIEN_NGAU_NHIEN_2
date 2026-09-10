@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biến ngẫu nhiên — Bài học tương tác</title>
+
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(','\\)'], ['$', '$']],
+        displayMath: [['\\[','\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    :root{
+      --bg:#07111f;
+      --bg2:#0a1b2e;
+      --panel:#10243a;
+      --panel2:#0d2033;
+      --surface:#081b2d;
+      --surface2:#071827;
+      --line:#1f4d68;
+      --cyan:#31d5ff;
+      --cyan2:#8be9fd;
+      --blue:#4aa8ff;
+      --green:#4ade80;
+      --yellow:#facc15;
+      --orange:#fb923c;
+      --red:#fb7185;
+      --text:#eaf6ff;
+      --muted:#a9bfd0;
+      --white:#ffffff;
+      --nav:rgba(7,17,31,.88);
+      --section-bg:linear-gradient(180deg,rgba(16,36,58,.90),rgba(10,27,46,.92));
+      --formula-bg:rgba(49,213,255,.06);
+      --note-bg:rgba(250,204,21,.08);
+      --note-text:#fff7c2;
+      --success-bg:rgba(74,222,128,.08);
+      --success-text:#d9ffe6;
+      --shadow:0 20px 50px rgba(0,0,0,.28);
+      --radius:22px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body[data-theme="light"]{
+      --bg:#f4f9fd;
+      --bg2:#eaf5fb;
+      --panel:#ffffff;
+      --panel2:#f6fbff;
+      --surface:#ffffff;
+      --surface2:#f5faff;
+      --line:#b9d9e8;
+      --cyan:#007fa8;
+      --cyan2:#006b8e;
+      --blue:#1769aa;
+      --green:#16803d;
+      --yellow:#b58100;
+      --orange:#c65d10;
+      --red:#c83f58;
+      --text:#102235;
+      --muted:#52697c;
+      --white:#102235;
+      --nav:rgba(255,255,255,.92);
+      --section-bg:linear-gradient(180deg,#ffffff,#f7fbfe);
+      --formula-bg:#eef9fd;
+      --note-bg:#fff9df;
+      --note-text:#604b00;
+      --success-bg:#edf9f0;
+      --success-text:#185c2f;
+      --shadow:0 14px 36px rgba(31,73,96,.12);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--cyan) 12%, transparent), transparent 30%),
+        radial-gradient(circle at 100% 20%, color-mix(in srgb, var(--blue) 10%, transparent), transparent 32%),
+        linear-gradient(180deg,var(--bg),var(--bg2));
+      color:var(--text);
+      font-family:var(--font);
+      line-height:1.65;
+    }
+
+    a{color:inherit}
+    button,input,select{font:inherit}
+
+    .progress{
+      position:fixed;left:0;top:0;height:4px;width:0;
+      background:linear-gradient(90deg,var(--cyan),var(--blue));
+      z-index:9999;
+    }
+
+    .hero{
+      padding:72px 20px 36px;
+      border-bottom:1px solid rgba(139,233,253,.15);
+    }
+    .hero-inner{
+      width:min(1180px,100%);
+      margin:auto;
+      display:grid;
+      grid-template-columns:1.35fr .65fr;
+      gap:28px;
+      align-items:center;
+    }
+    .eyebrow{
+      display:inline-flex;gap:8px;align-items:center;
+      border:1px solid rgba(49,213,255,.35);
+      padding:7px 12px;border-radius:999px;
+      color:var(--cyan2);background:rgba(49,213,255,.07);
+      font-size:.9rem;font-weight:700;letter-spacing:.04em;
+    }
+    h1{
+      margin:18px 0 12px;
+      font-size:clamp(2.2rem,5vw,4.7rem);
+      line-height:1.03;
+      letter-spacing:-.045em;
+    }
+    .lead{
+      max-width:800px;color:var(--muted);font-size:1.08rem;
+    }
+    .hero-badge{
+      background:linear-gradient(145deg,rgba(49,213,255,.14),rgba(74,168,255,.06));
+      border:1px solid rgba(49,213,255,.25);
+      border-radius:28px;
+      min-height:240px;
+      display:grid;place-items:center;
+      box-shadow:var(--shadow);
+      text-align:center;
+      padding:24px;
+    }
+    .hero-badge .x{
+      width:120px;height:120px;border-radius:30px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--cyan),var(--blue));
+      color:#042031;font-size:4.5rem;font-weight:900;
+      transform:rotate(-5deg);
+      box-shadow:0 20px 40px rgba(49,213,255,.20);
+    }
+
+    .topnav-wrap{
+      position:sticky;top:4px;z-index:120;
+      padding:10px 16px 0;
+    }
+    .topnav{
+      width:min(1180px,100%);margin:auto;
+      background:var(--nav);
+      backdrop-filter:blur(16px);
+      border:1px solid rgba(139,233,253,.16);
+      border-radius:18px;
+      padding:10px;
+      display:flex;gap:8px;flex-wrap:wrap;
+      box-shadow:0 8px 30px rgba(0,0,0,.2);
+    }
+    .topnav a{
+      text-decoration:none;color:var(--muted);
+      padding:8px 12px;border-radius:12px;
+      transition:.2s;
+      font-size:.92rem;
+    }
+    .topnav a:hover{background:rgba(49,213,255,.10);color:var(--text)}
+
+    main{
+      width:min(1180px,100%);
+      margin:0 auto;
+      padding:32px 20px 80px;
+    }
+
+    .section{
+      background:var(--section-bg);
+      border:1px solid rgba(139,233,253,.13);
+      border-radius:var(--radius);
+      padding:clamp(22px,3vw,38px);
+      margin:24px 0;
+      box-shadow:var(--shadow);
+    }
+    .section h2{
+      margin:0 0 10px;
+      font-size:clamp(1.65rem,3vw,2.5rem);
+      letter-spacing:-.025em;
+    }
+    .section h3{margin:24px 0 10px;color:var(--cyan2)}
+    .section-intro{color:var(--muted);margin-top:0}
+
+    .grid-2{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;
+    }
+    .grid-3{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;
+    }
+
+    .card{
+      background:var(--surface);
+      border:1px solid rgba(139,233,253,.14);
+      border-radius:18px;padding:20px;
+    }
+    .card strong{color:var(--white)}
+
+    .pill{
+      display:inline-block;padding:5px 10px;border-radius:999px;
+      background:rgba(49,213,255,.10);color:var(--cyan2);
+      border:1px solid rgba(49,213,255,.22);
+      font-size:.83rem;font-weight:750;
+    }
+
+    .formula{
+      background:var(--formula-bg);
+      border:1px solid rgba(49,213,255,.18);
+      border-left:4px solid var(--cyan);
+      border-radius:14px;
+      padding:16px 18px;margin:14px 0;
+      overflow:auto;
+    }
+
+    .note{
+      background:var(--note-bg);
+      border:1px solid rgba(250,204,21,.25);
+      border-radius:14px;padding:15px 17px;
+      color:var(--note-text);
+    }
+    .success{
+      background:var(--success-bg);
+      border:1px solid rgba(74,222,128,.22);
+      border-radius:14px;padding:15px 17px;
+      color:var(--success-text);
+    }
+
+    .controls{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(120px,1fr));
+      gap:12px;
+      margin:18px 0;
+    }
+    label{
+      display:flex;flex-direction:column;gap:6px;
+      color:var(--muted);font-size:.92rem;
+    }
+    input[type="number"]{
+      width:100%;border:none;outline:none;
+      background:var(--surface2);color:var(--text);
+      border:1px solid rgba(139,233,253,.18);
+      padding:11px 12px;border-radius:12px;
+    }
+
+    .btn{
+      appearance:none;border:none;cursor:pointer;
+      padding:11px 15px;border-radius:12px;
+      font-weight:800;
+      background:linear-gradient(135deg,var(--cyan),var(--blue));
+      color:#062235;
+      transition:.18s;
+    }
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+    .btn.secondary{
+      background:rgba(49,213,255,.10);
+      color:var(--cyan2);
+      border:1px solid rgba(49,213,255,.22);
+    }
+
+    .outcome-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px;
+    }
+    .outcome{
+      padding:18px;border-radius:16px;
+      border:1px solid rgba(139,233,253,.14);
+      background:var(--surface);
+    }
+    .outcome .big{
+      font-size:1.6rem;font-weight:900;color:var(--cyan2);
+    }
+
+    table{
+      width:100%;border-collapse:collapse;margin:16px 0 8px;
+      overflow:hidden;border-radius:14px;
+    }
+    th,td{
+      border:1px solid rgba(139,233,253,.15);
+      padding:11px 10px;text-align:center;
+    }
+    th{background:rgba(49,213,255,.10);color:var(--cyan2)}
+    td{background:var(--surface2)}
+    .table-wrap{overflow:auto}
+
+    .stat-grid{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;margin-top:16px;
+    }
+    .stat{
+      background:var(--surface2);
+      border:1px solid rgba(139,233,253,.14);
+      border-radius:16px;padding:16px;
+    }
+    .stat .num{font-size:1.55rem;font-weight:900;color:var(--cyan2)}
+    .stat .label{font-size:.88rem;color:var(--muted)}
+
+    .quiz-card{
+      background:var(--surface);border:1px solid rgba(139,233,253,.14);
+      border-radius:16px;padding:18px;margin:14px 0;
+    }
+    .quiz-card p{margin-top:0}
+    .option{
+      display:flex;gap:10px;align-items:flex-start;
+      padding:10px 12px;margin:8px 0;
+      border-radius:12px;border:1px solid rgba(139,233,253,.10);
+      cursor:pointer;
+    }
+    .option:hover{background:rgba(49,213,255,.06)}
+    .option input{margin-top:5px}
+    .feedback{margin-top:8px;font-weight:750}
+    .correct{color:var(--green)}
+    .wrong{color:var(--red)}
+
+
+    .theme-toggle{
+      margin-left:auto;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid rgba(49,213,255,.22);
+      background:var(--surface);
+      color:var(--text);
+      padding:8px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:750;
+    }
+    .theme-toggle:hover{transform:translateY(-1px)}
+    .meaning{
+      margin-top:14px;
+      padding:14px 15px;
+      border-radius:14px;
+      background:var(--surface2);
+      border:1px dashed rgba(49,213,255,.25);
+    }
+    .meaning strong{color:var(--cyan2)}
+    .teaching-point{
+      margin-top:18px;
+      padding:18px;
+      border-radius:16px;
+      background:var(--formula-bg);
+      border:1px solid rgba(49,213,255,.18);
+    }
+
+    .video-wrap{
+      position:relative;padding-top:56.25%;
+      border-radius:18px;overflow:hidden;
+      border:1px solid rgba(139,233,253,.14);
+      background:#000;
+    }
+    .video-wrap iframe{
+      position:absolute;inset:0;width:100%;height:100%;border:0;
+    }
+
+    .mini{
+      font-size:.92rem;color:var(--muted);
+    }
+
+    .backtop{
+      position:fixed;right:18px;bottom:18px;z-index:200;
+      width:46px;height:46px;border-radius:50%;
+      border:1px solid rgba(49,213,255,.25);
+      background:var(--nav);
+      color:var(--cyan2);cursor:pointer;
+      display:grid;place-items:center;
+    }
+
+    footer{
+      text-align:center;color:var(--muted);
+      padding:28px 20px 50px;
+    }
+
+    @media (max-width:850px){
+      .hero-inner,.grid-2,.grid-3{grid-template-columns:1fr}
+      .hero-badge{min-height:180px}
+      .controls{grid-template-columns:1fr}
+      .outcome-grid,.stat-grid{grid-template-columns:1fr}
+      .theme-toggle{margin-left:0}
+    }
+  </style>
+</head>
+
+<body>
+<div id="readProgress" class="progress"></div>
+
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <div>
+      <span class="eyebrow">XÁC SUẤT THỐNG KÊ • BÀI HỌC TƯƠNG TÁC</span>
+      <h1>Biến ngẫu nhiên</h1>
+      <p class="lead">
+        Học khái niệm biến ngẫu nhiên qua hai tình huống thực tế: bảo hiểm và kiểm tra sản phẩm trong kho.
+        Từ hoạt động tương tác, bạn sẽ biết cách xác định các giá trị của biến ngẫu nhiên, tính xác suất,
+        lập bảng phân phối xác suất và tính các đặc trưng số cơ bản.
+      </p>
+    </div>
+    <div class="hero-badge">
+      <div>
+        <div class="x">X</div>
+        <p><strong>Một con số gắn với kết quả ngẫu nhiên</strong></p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="topnav-wrap">
+  <nav class="topnav">
+    <a href="#muctieu">Mục tiêu</a>
+    <a href="#hd1">Hoạt động 1</a>
+    <a href="#khainiem">Khái niệm</a>
+    <a href="#hd2">Hoạt động 2</a>
+    <a href="#phanphoi">Bảng phân phối</a>
+    <a href="#dactrung">Đặc trưng số</a>
+    <a href="#phanloai">Phân loại</a>
+    <a href="#quiz">Củng cố</a>
+    <a href="#video">Video</a>
+    <button id="themeToggle" class="theme-toggle" type="button" onclick="toggleTheme()">
+      <span id="themeIcon">☀️</span>
+      <span id="themeText">Chế độ sáng</span>
+    </button>
+  </nav>
+</div>
+
+<main>
+  <section class="section" id="muctieu">
+    <span class="pill">MỤC TIÊU BÀI HỌC</span>
+    <h2>Sau bài này, bạn cần làm được gì?</h2>
+    <div class="grid-2">
+      <div class="card">
+        <strong>1. Hiểu trực quan biến ngẫu nhiên</strong>
+        <p class="mini">Biết rằng mỗi kết quả của phép thử được gán với một giá trị số.</p>
+      </div>
+      <div class="card">
+        <strong>2. Tính \(P(X=x)\)</strong>
+        <p class="mini">Xác định xác suất để biến ngẫu nhiên nhận một giá trị cụ thể.</p>
+      </div>
+      <div class="card">
+        <strong>3. Lập bảng phân phối xác suất</strong>
+        <p class="mini">Liệt kê đầy đủ các giá trị khả dĩ của \(X\) và xác suất tương ứng.</p>
+      </div>
+      <div class="card">
+        <strong>4. Tính các đặc trưng số</strong>
+        <p class="mini">Tính kỳ vọng, phương sai và độ lệch chuẩn từ bảng phân phối rời rạc.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="hd1">
+    <span class="pill">HOẠT ĐỘNG TƯƠNG TÁC 1</span>
+    <h2>Bài toán bảo hiểm</h2>
+    <p class="section-intro">
+      Một công ty bảo hiểm bán sản phẩm bảo hiểm tai nạn trong một năm. Phí bảo hiểm là
+      \(65\) nghìn đồng. Nếu khách hàng bị tai nạn, công ty phải bồi thường \(10\) triệu đồng.
+      Xác suất một người mua bảo hiểm bị tai nạn trong một năm là \(p=0.004\).
+    </p>
+
+    <div class="formula">
+      Gọi \(X\) là <strong>số tiền công ty thu lợi từ một khách hàng</strong>, đơn vị triệu đồng.
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Trường hợp 1: Khách hàng bị tai nạn</h3>
+        <p>Công ty thu phí \(0.065\) triệu và chi \(10\) triệu.</p>
+        <div class="formula">\[
+          X=0.065-10=-9.935.
+        \]</div>
+        <p>Xác suất: \(P(X=-9.935)=0.004\).</p>
+      </div>
+      <div class="card">
+        <h3>Trường hợp 2: Không bị tai nạn</h3>
+        <p>Công ty chỉ thu phí \(0.065\) triệu đồng.</p>
+        <div class="formula">\[
+          X=0.065.
+        \]</div>
+        <p>Xác suất: \(P(X=0.065)=1-0.004=0.996\).</p>
+      </div>
+    </div>
+
+    <h3>Tương tác: thay đổi xác suất tai nạn</h3>
+    <div class="controls">
+      <label>
+        Xác suất tai nạn \(p\)
+        <input id="ins_p" type="number" min="0" max="1" step="0.001" value="0.004">
+      </label>
+      <label>
+        Phí bảo hiểm (triệu đồng)
+        <input id="ins_fee" type="number" min="0" step="0.001" value="0.065">
+      </label>
+      <label>
+        Tiền bồi thường (triệu đồng)
+        <input id="ins_pay" type="number" min="0" step="0.1" value="10">
+      </label>
+    </div>
+    <button class="btn" onclick="updateInsurance()">Cập nhật bảng phân phối</button>
+
+    <div class="outcome-grid">
+      <div class="outcome">
+        <div class="mini">Nếu bị tai nạn</div>
+        <div class="big" id="ins_x1">-9.935</div>
+        <div class="mini">triệu đồng</div>
+      </div>
+      <div class="outcome">
+        <div class="mini">Nếu không tai nạn</div>
+        <div class="big" id="ins_x2">0.065</div>
+        <div class="mini">triệu đồng</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>\(X\)</th><th id="ins_th1">\(-9.935\)</th><th id="ins_th2">\(0.065\)</th></tr></thead>
+        <tbody><tr><th>\(P\)</th><td id="ins_prob1">0.004</td><td id="ins_prob2">0.996</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="label">Kỳ vọng \(E(X)\)</div><div class="num" id="ins_mean">0.0250</div></div>
+      <div class="stat"><div class="label">Phương sai \(Var(X)\)</div><div class="num" id="ins_var">0.3984</div></div>
+      <div class="stat"><div class="label">Độ lệch chuẩn \(\sigma\)</div><div class="num" id="ins_sd">0.6312</div></div>
+    </div>
+
+    <div class="note">
+      Hãy quan sát: giá trị của \(X\) không được biết chắc trước khi phép thử xảy ra.
+      Nhưng ta biết được <strong>những giá trị nào có thể xảy ra</strong> và <strong>xác suất của từng giá trị</strong>.
+    </div>
+  </section>
+
+  <section class="section" id="khainiem">
+    <span class="pill">HÌNH THÀNH KHÁI NIỆM</span>
+    <h2>Biến ngẫu nhiên là gì?</h2>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Hiểu trực quan</h3>
+        <p>
+          Biến ngẫu nhiên là một hàm số xác định trên không gian mẫu của phép thử ngẫu nhiên,
+          trong đó <strong>mỗi kết quả \(\omega\)</strong> được gán với <strong>một số thực \(X(\omega)\)</strong>.
+          Nói cách khác, biến ngẫu nhiên giúp ta mô tả kết quả của một phép thử bằng số.
+        </p>
+        <div class="formula">\[
+          X:\Omega\longrightarrow \mathbb{R},\qquad
+          \omega\longmapsto X(\omega).
+        \]</div>
+      </div>
+
+      <div class="card">
+        <h3>Ba điều cần nhớ</h3>
+        <p>1. \(X\) là một biến ngẫu nhiên.</p>
+        <p>2. \((X=x_i)\) là một biến cố.</p>
+        <p>3. \(P(X=x_i)\) là xác suất để \(X\) nhận giá trị \(x_i\).</p>
+      </div>
+    </div>
+
+    <div class="success">
+      Trong ví dụ bảo hiểm, phép thử có hai kết quả cần xét: khách hàng bị tai nạn và khách hàng không bị tai nạn.
+      Biến ngẫu nhiên \(X\) gán hai kết quả đó lần lượt với hai giá trị \(-9.935\) và \(0.065\) triệu đồng.
+      Vì vậy, khi viết \((X=x_i)\), ta đang nói đến một biến cố của phép thử.
+    </div>
+  </section>
+
+  <section class="section" id="hd2">
+    <span class="pill">HOẠT ĐỘNG TƯƠNG TÁC 2</span>
+    <h2>Chọn sản phẩm từ kho</h2>
+    <p class="section-intro">
+      Trong kho có \(a\) sản phẩm xấu và \(b\) sản phẩm tốt. Chọn ngẫu nhiên không hoàn lại \(k\) sản phẩm.
+      Gọi \(X\) là số sản phẩm tốt trong \(k\) sản phẩm được chọn.
+    </p>
+
+    <div class="formula">
+      Nếu \(X=x\), ta cần chọn \(x\) sản phẩm tốt từ \(b\) sản phẩm tốt và chọn
+      \(k-x\) sản phẩm xấu từ \(a\) sản phẩm xấu:
+      \[
+      P(X=x)=\frac{\mathrm{C}_{b}^{x}\,\mathrm{C}_{a}^{\,k-x}}
+      {\mathrm{C}_{a+b}^{k}}.
+      \]
+    </div>
+
+    <div class="controls">
+      <label>
+        Số sản phẩm xấu \(a\)
+        <input id="wh_a" type="number" min="0" step="1" value="4">
+      </label>
+      <label>
+        Số sản phẩm tốt \(b\)
+        <input id="wh_b" type="number" min="0" step="1" value="6">
+      </label>
+      <label>
+        Số sản phẩm lấy ra \(k\)
+        <input id="wh_k" type="number" min="0" step="1" value="3">
+      </label>
+    </div>
+    <button class="btn" onclick="updateWarehouse()">Lập bảng phân phối xác suất</button>
+
+    <div id="wh_message" class="note" style="display:none"></div>
+
+    <div class="table-wrap">
+      <table id="wh_table">
+        <thead>
+          <tr id="wh_head"><th>\(x\)</th></tr>
+        </thead>
+        <tbody>
+          <tr id="wh_prob"><th>\(P(X=x)\)</th></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="label">Kỳ vọng \(E(X)\)</div><div class="num" id="wh_mean">—</div></div>
+      <div class="stat"><div class="label">Phương sai \(Var(X)\)</div><div class="num" id="wh_var">—</div></div>
+      <div class="stat"><div class="label">Độ lệch chuẩn \(\sigma\)</div><div class="num" id="wh_sd">—</div></div>
+    </div>
+
+    <div class="success" style="margin-top:16px">
+      Qua hoạt động này, \(X\) có thể nhận nhiều giá trị khác nhau, nhưng vẫn là một tập hữu hạn các giá trị.
+      Đây là một ví dụ điển hình của <strong>biến ngẫu nhiên rời rạc</strong>.
+    </div>
+  </section>
+
+  <section class="section" id="phanphoi">
+    <span class="pill">KIẾN THỨC TRỌNG TÂM</span>
+    <h2>Bảng phân phối xác suất của biến ngẫu nhiên rời rạc</h2>
+    <p>
+      Giả sử biến ngẫu nhiên rời rạc \(X\) có thể nhận các giá trị
+      \(x_1,x_2,\ldots,x_n\), trong đó \(p_i=P(X=x_i)\).
+      Khi đó bảng phân phối xác suất của \(X\) có dạng:
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>\(X\)</th><th>\(x_1\)</th><th>\(x_2\)</th><th>\(\cdots\)</th><th>\(x_n\)</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>\(P\)</th><td>\(p_1\)</td><td>\(p_2\)</td><td>\(\cdots\)</td><td>\(p_n\)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="formula">
+      Các xác suất phải thỏa:
+      \[
+      p_i\ge 0,\qquad \sum_{i=1}^{n}p_i=1.
+      \]
+    </div>
+
+    <h3>Quy trình lập bảng</h3>
+    <div class="grid-3">
+      <div class="card"><strong>Bước 1</strong><br>Xác định phép thử và biến ngẫu nhiên \(X\).</div>
+      <div class="card"><strong>Bước 2</strong><br>Tìm tất cả giá trị khả dĩ \(x_i\) của \(X\).</div>
+      <div class="card"><strong>Bước 3</strong><br>Tính \(P(X=x_i)\) và kiểm tra tổng bằng 1.</div>
+    </div>
+  </section>
+
+  <section class="section" id="dactrung">
+    <span class="pill">ĐẶC TRƯNG SỐ</span>
+    <h2>Kỳ vọng, phương sai và độ lệch chuẩn</h2>
+    <p class="section-intro">
+      Sau khi đã lập được bảng phân phối xác suất, ta không chỉ muốn biết \(X\) có thể nhận những giá trị nào,
+      mà còn muốn trả lời hai câu hỏi: <strong>giá trị của \(X\) thường tập trung quanh đâu?</strong> và
+      <strong>các giá trị của \(X\) phân tán nhiều hay ít?</strong>
+    </p>
+
+    <div class="grid-3">
+      <div class="card">
+        <h3>1. Kỳ vọng \(E(X)\)</h3>
+        <div class="formula">\[
+          E(X)=\sum_i x_i p_i.
+        \]</div>
+        <div class="meaning">
+          <strong>Kỳ vọng là gì?</strong>
+          Kỳ vọng là giá trị trung bình có tính đến xác suất của từng giá trị mà biến ngẫu nhiên có thể nhận.
+          Vì vậy, mỗi \(x_i\) không được tính ngang nhau, mà được “cân” bởi xác suất \(p_i\).
+        </div>
+        <div class="meaning">
+          <strong>Ý nghĩa:</strong>
+          Nếu cùng một phép thử được lặp lại rất nhiều lần trong những điều kiện như nhau,
+          trung bình các giá trị quan sát được của \(X\) có xu hướng tiến gần \(E(X)\).
+          Kỳ vọng vì thế thường được dùng để mô tả <em>mức trung bình dài hạn</em>.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>2. Phương sai \(Var(X)\)</h3>
+        <div class="formula">\[
+          Var(X)=\sum_i [x_i-E(X)]^2p_i.
+        \]</div>
+        <div class="meaning">
+          <strong>Phương sai là gì?</strong>
+          Phương sai là trung bình có trọng số xác suất của các <em>bình phương độ lệch</em>
+          giữa từng giá trị \(x_i\) và kỳ vọng \(E(X)\).
+        </div>
+        <div class="meaning">
+          <strong>Ý nghĩa:</strong>
+          Phương sai đo mức độ phân tán của \(X\) quanh giá trị kỳ vọng.
+          \(Var(X)\) càng nhỏ thì các giá trị của \(X\) càng tập trung quanh \(E(X)\);
+          \(Var(X)\) càng lớn thì mức độ biến động càng cao.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>3. Độ lệch chuẩn \(\sigma\)</h3>
+        <div class="formula">\[
+          \sigma=\sqrt{Var(X)}.
+        \]</div>
+        <div class="meaning">
+          <strong>Độ lệch chuẩn là gì?</strong>
+          Độ lệch chuẩn là căn bậc hai của phương sai.
+        </div>
+        <div class="meaning">
+          <strong>Ý nghĩa:</strong>
+          Độ lệch chuẩn cũng phản ánh mức độ phân tán của \(X\), nhưng có ưu điểm là
+          <strong>cùng đơn vị với \(X\)</strong>. Vì vậy, trong thực tế nó thường dễ diễn giải hơn phương sai.
+        </div>
+      </div>
+    </div>
+
+    <div class="teaching-point">
+      <strong>Hiểu mối quan hệ giữa ba đại lượng:</strong><br>
+      \(E(X)\) cho biết <strong>vị trí trung tâm</strong> của phân phối;
+      \(Var(X)\) và \(\sigma\) cho biết <strong>mức độ phân tán</strong> quanh vị trí trung tâm đó.
+      Hai biến ngẫu nhiên có thể có cùng kỳ vọng nhưng mức độ biến động rất khác nhau.
+    </div>
+
+    <div class="note">
+      Công thức tính nhanh phương sai:
+      \[
+      Var(X)=E(X^2)-[E(X)]^2,\qquad
+      E(X^2)=\sum_i x_i^2p_i.
+      \]
+      Công thức này cho cùng kết quả với định nghĩa ở trên và thường thuận tiện hơn khi tính toán từ bảng phân phối.
+    </div>
+
+    <div class="success">
+      <strong>Liên hệ với bài toán bảo hiểm:</strong>
+      \(E(X)\) cho biết số tiền thu lợi trung bình dài hạn của công ty trên mỗi hợp đồng nếu có rất nhiều khách hàng
+      có cùng mức rủi ro. Trong khi đó, \(Var(X)\) và \(\sigma\) phản ánh mức độ biến động của khoản thu lợi quanh giá trị trung bình đó.
+      Do đó, chỉ nhìn vào kỳ vọng chưa đủ để đánh giá đầy đủ mức độ rủi ro.
+    </div>
+  </section>
+
+  <section class="section" id="phanloai">
+    <span class="pill">PHÂN LOẠI</span>
+    <h2>Rời rạc và liên tục</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Biến ngẫu nhiên rời rạc</h3>
+        <p>
+          Có tập giá trị hữu hạn hoặc đếm được. Hai hoạt động trong bài này đều cho các biến ngẫu nhiên rời rạc.
+        </p>
+        <p class="mini">Ví dụ: số sản phẩm tốt lấy được, số khách đến quầy, số lần xuất hiện mặt ngửa.</p>
+      </div>
+      <div class="card">
+        <h3>Biến ngẫu nhiên liên tục</h3>
+        <p>
+          Có thể nhận vô số giá trị trên một khoảng của trục số; tập giá trị thường không thể liệt kê thành từng giá trị riêng lẻ.
+        </p>
+        <p class="mini">Ví dụ: thời gian chờ, chiều cao, nhiệt độ. Bài này chỉ giới thiệu để phân loại, chưa đi sâu.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="quiz">
+    <span class="pill">HOẠT ĐỘNG CỦNG CỐ</span>
+    <h2>5 câu trắc nghiệm</h2>
+    <p class="section-intro">Chọn đáp án rồi bấm “Chấm bài”.</p>
+
+    <div id="quizContainer"></div>
+    <button class="btn" onclick="gradeQuiz()">Chấm bài</button>
+    <button class="btn secondary" onclick="resetQuiz()">Làm lại</button>
+    <div id="quizResult" class="success" style="display:none;margin-top:16px"></div>
+  </section>
+
+  <section class="section" id="video">
+    <span class="pill">VIDEO BÀI HỌC</span>
+    <h2>Biến ngẫu nhiên và các đặc trưng số</h2>
+    <p class="section-intro">
+      Video tham khảo: “[Xác suất thống kê] Biến ngẫu nhiên. Hàm phân phối, hàm mật độ xác suất và các đặc trưng số của BNN.”
+    </p>
+    <div class="video-wrap">
+      <iframe
+        src="https://www.youtube.com/embed/G3pYsL9q8ss"
+        title="Biến ngẫu nhiên"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </section>
+
+  <section class="section">
+    <span class="pill">GHI NHỚ CUỐI BÀI</span>
+    <h2>4 ý quan trọng</h2>
+    <div class="grid-2">
+      <div class="card"><strong>Biến ngẫu nhiên</strong> gán mỗi kết quả của phép thử với một số thực.</div>
+      <div class="card"><strong>\(P(X=x)\)</strong> là xác suất biến ngẫu nhiên nhận giá trị \(x\).</div>
+      <div class="card"><strong>Bảng phân phối</strong> liệt kê các giá trị của \(X\) cùng xác suất tương ứng.</div>
+      <div class="card"><strong>Kỳ vọng – phương sai – độ lệch chuẩn</strong> mô tả vị trí trung tâm và mức phân tán của phân phối.</div>
+    </div>
+  </section>
+</main>
+
+<button class="backtop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Lên đầu trang">↑</button>
+
+<footer>
+  Bài học tương tác: Biến ngẫu nhiên • Xác suất thống kê
+</footer>
+
+<script>
+
+  // ============================================================
+  // CHẾ ĐỘ SÁNG / TỐI
+  // ============================================================
+  function applyTheme(theme){
+    document.body.setAttribute("data-theme", theme);
+
+    const icon = document.getElementById("themeIcon");
+    const text = document.getElementById("themeText");
+
+    if(theme === "light"){
+      icon.textContent = "🌙";
+      text.textContent = "Chế độ tối";
+    }else{
+      icon.textContent = "☀️";
+      text.textContent = "Chế độ sáng";
+    }
+
+    localStorage.setItem("random-variable-theme", theme);
+  }
+
+  function toggleTheme(){
+    const current = document.body.getAttribute("data-theme") || "dark";
+    applyTheme(current === "dark" ? "light" : "dark");
+  }
+
+  function loadTheme(){
+    const saved = localStorage.getItem("random-variable-theme");
+    if(saved === "light" || saved === "dark"){
+      applyTheme(saved);
+      return;
+    }
+
+    const prefersLight = window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: light)").matches;
+
+    applyTheme(prefersLight ? "light" : "dark");
+  }
+
+  // ============================================================
+  // TIỆN ÍCH TOÁN
+  // ============================================================
+  function comb(n, r){
+    n = Math.trunc(n); r = Math.trunc(r);
+    if(r < 0 || n < 0 || r > n) return 0;
+    r = Math.min(r, n-r);
+    let ans = 1;
+    for(let i=1;i<=r;i++){
+      ans = ans * (n-r+i) / i;
+    }
+    return ans;
+  }
+
+  function fmt(x, digits=6){
+    if(!Number.isFinite(x)) return "—";
+    let s = x.toFixed(digits);
+    s = s.replace(/\.?0+$/,'');
+    return s === "-0" ? "0" : s;
+  }
+
+  function refreshMath(){
+    if(window.MathJax && MathJax.typesetPromise){
+      MathJax.typesetPromise();
+    }
+  }
+
+  // ============================================================
+  // HOẠT ĐỘNG 1: BẢO HIỂM
+  // ============================================================
+  function updateInsurance(){
+    const p = Number(document.getElementById('ins_p').value);
+    const fee = Number(document.getElementById('ins_fee').value);
+    const pay = Number(document.getElementById('ins_pay').value);
+
+    if(!(p >= 0 && p <= 1) || fee < 0 || pay < 0){
+      alert("Vui lòng nhập p trong [0,1] và các số tiền không âm.");
+      return;
+    }
+
+    const x1 = fee - pay;
+    const x2 = fee;
+    const p1 = p;
+    const p2 = 1-p;
+
+    const mean = x1*p1 + x2*p2;
+    const ex2 = x1*x1*p1 + x2*x2*p2;
+    const variance = ex2 - mean*mean;
+    const sd = Math.sqrt(Math.max(0, variance));
+
+    document.getElementById('ins_x1').textContent = fmt(x1,6);
+    document.getElementById('ins_x2').textContent = fmt(x2,6);
+    document.getElementById('ins_prob1').textContent = fmt(p1,6);
+    document.getElementById('ins_prob2').textContent = fmt(p2,6);
+    document.getElementById('ins_th1').innerHTML = `\\(${fmt(x1,6)}\\)`;
+    document.getElementById('ins_th2').innerHTML = `\\(${fmt(x2,6)}\\)`;
+
+    document.getElementById('ins_mean').textContent = fmt(mean,6);
+    document.getElementById('ins_var').textContent = fmt(variance,6);
+    document.getElementById('ins_sd').textContent = fmt(sd,6);
+
+    refreshMath();
+  }
+
+  // ============================================================
+  // HOẠT ĐỘNG 2: KHO SẢN PHẨM — PHÂN PHỐI SIÊU BỘI
+  // ============================================================
+  function updateWarehouse(){
+    const a = Math.trunc(Number(document.getElementById('wh_a').value));
+    const b = Math.trunc(Number(document.getElementById('wh_b').value));
+    const k = Math.trunc(Number(document.getElementById('wh_k').value));
+    const msg = document.getElementById('wh_message');
+
+    if(a < 0 || b < 0 || k < 0 || k > a+b){
+      msg.style.display = 'block';
+      msg.textContent = "Dữ liệu chưa hợp lệ. Cần a ≥ 0, b ≥ 0 và 0 ≤ k ≤ a+b.";
+      return;
+    }
+    msg.style.display = 'none';
+
+    const xmin = Math.max(0, k-a);
+    const xmax = Math.min(k, b);
+    const den = comb(a+b,k);
+
+    let xs = [];
+    let ps = [];
+    for(let x=xmin; x<=xmax; x++){
+      const p = den === 0 ? 0 : comb(b,x)*comb(a,k-x)/den;
+      xs.push(x); ps.push(p);
+    }
+
+    const head = document.getElementById('wh_head');
+    const prob = document.getElementById('wh_prob');
+    head.innerHTML = '<th>\\(x\\)</th>';
+    prob.innerHTML = '<th>\\(P(X=x)\\)</th>';
+
+    xs.forEach((x,i)=>{
+      const th = document.createElement('th');
+      th.textContent = x;
+      head.appendChild(th);
+
+      const td = document.createElement('td');
+      td.textContent = fmt(ps[i],6);
+      prob.appendChild(td);
+    });
+
+    let mean = 0, ex2 = 0;
+    xs.forEach((x,i)=>{
+      mean += x*ps[i];
+      ex2 += x*x*ps[i];
+    });
+    const variance = ex2 - mean*mean;
+    const sd = Math.sqrt(Math.max(0,variance));
+
+    document.getElementById('wh_mean').textContent = fmt(mean,6);
+    document.getElementById('wh_var').textContent = fmt(variance,6);
+    document.getElementById('wh_sd').textContent = fmt(sd,6);
+
+    refreshMath();
+  }
+
+  // ============================================================
+  // QUIZ
+  // ============================================================
+  const quizData = [
+    {
+      q:"Phát biểu nào mô tả đúng nhất về biến ngẫu nhiên?",
+      options:[
+        "Là một biến luôn nhận cùng một giá trị.",
+        "Là một quy tắc gán mỗi kết quả của phép thử ngẫu nhiên với một số thực.",
+        "Là xác suất của một biến cố.",
+        "Là một bảng số bất kỳ."
+      ],
+      correct:1,
+      explain:"Biến ngẫu nhiên là một hàm số từ không gian mẫu vào tập số thực."
+    },
+    {
+      q:"Trong ví dụ bảo hiểm, nếu khách hàng bị tai nạn thì X bằng bao nhiêu triệu đồng?",
+      options:["0.065","10","-9.935","-10.065"],
+      correct:2,
+      explain:"Công ty thu 0.065 triệu và chi 10 triệu nên X = 0.065 - 10 = -9.935."
+    },
+    {
+      q:"Với biến ngẫu nhiên rời rạc X, tổng các xác suất trong bảng phân phối bằng bao nhiêu?",
+      options:["0","1","E(X)","Var(X)"],
+      correct:1,
+      explain:"Các biến cố X=x_i tạo thành các khả năng đầy đủ nên tổng xác suất bằng 1."
+    },
+    {
+      q:"Trong kho có a sản phẩm xấu, b sản phẩm tốt, lấy k sản phẩm. Gọi X là số sản phẩm tốt được lấy. Công thức đúng cho P(X=x) là:",
+      options:[
+        "\\(\\frac{\\mathrm{C}_{a}^{x}\\,\\mathrm{C}_{b}^{k-x}}{\\mathrm{C}_{a+b}^{k}}\\)",
+        "\\(\\frac{\\mathrm{C}_{b}^{x}\\,\\mathrm{C}_{a}^{k-x}}{\\mathrm{C}_{a+b}^{k}}\\)",
+        "\\(\\frac{\\mathrm{C}_{k}^{x}}{\\mathrm{C}_{a+b}^{x}}\\)",
+        "\\(\\frac{x}{a+b}\\)"
+      ],
+      correct:1,
+      explain:"Có \(\mathrm{C}_{b}^{x}\) cách chọn \(x\) sản phẩm tốt và \(\mathrm{C}_{a}^{k-x}\) cách chọn \(k-x\) sản phẩm xấu; tổng số cách chọn \(k\) sản phẩm từ kho là \(\mathrm{C}_{a+b}^{k}\)."
+    },
+    {
+      q:"Công thức nào đúng cho độ lệch chuẩn của X?",
+      options:[
+        "\\(\\sigma=Var(X)^2\\)",
+        "\\(\\sigma=E(X)^2\\)",
+        "\\(\\sigma=\\sqrt{Var(X)}\\)",
+        "\\(\\sigma=E(X^2)\\)"
+      ],
+      correct:2,
+      explain:"Độ lệch chuẩn là căn bậc hai của phương sai."
+    }
+  ];
+
+  function renderQuiz(){
+    const box = document.getElementById('quizContainer');
+    box.innerHTML = '';
+    quizData.forEach((item,idx)=>{
+      const div = document.createElement('div');
+      div.className = 'quiz-card';
+      div.innerHTML = `<p><strong>Câu ${idx+1}.</strong> ${item.q}</p>`;
+      item.options.forEach((op,j)=>{
+        const label = document.createElement('label');
+        label.className = 'option';
+        label.innerHTML = `
+          <input type="radio" name="q${idx}" value="${j}">
+          <span>${op}</span>
+        `;
+        div.appendChild(label);
+      });
+      const fb = document.createElement('div');
+      fb.className = 'feedback';
+      fb.id = `fb${idx}`;
+      div.appendChild(fb);
+      box.appendChild(div);
+    });
+    refreshMath();
+  }
+
+  function gradeQuiz(){
+    let score = 0;
+    quizData.forEach((item,idx)=>{
+      const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+      const fb = document.getElementById(`fb${idx}`);
+      if(!selected){
+        fb.className='feedback wrong';
+        fb.textContent='Chưa chọn đáp án.';
+        return;
+      }
+      const val = Number(selected.value);
+      if(val === item.correct){
+        score++;
+        fb.className='feedback correct';
+        fb.textContent='Đúng. ' + item.explain;
+      }else{
+        fb.className='feedback wrong';
+        fb.textContent='Chưa đúng. ' + item.explain;
+      }
+    });
+
+    const rs = document.getElementById('quizResult');
+    rs.style.display = 'block';
+    rs.innerHTML = `<strong>Kết quả: ${score}/5 câu đúng.</strong> ${
+      score===5 ? 'Bạn đã nắm rất tốt các ý chính của bài.' :
+      score>=3 ? 'Bạn đã nắm phần lớn kiến thức, hãy xem lại các câu còn sai.' :
+      'Bạn nên quay lại hai hoạt động tương tác và phần bảng phân phối xác suất.'
+    }`;
+  }
+
+  function resetQuiz(){
+    renderQuiz();
+    const rs = document.getElementById('quizResult');
+    rs.style.display='none';
+    rs.textContent='';
+  }
+
+  // ============================================================
+  // TIẾN ĐỘ ĐỌC
+  // ============================================================
+  function updateProgress(){
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    const p = max > 0 ? (doc.scrollTop/max)*100 : 0;
+    document.getElementById('readProgress').style.width = p + '%';
+  }
+
+  window.addEventListener('scroll', updateProgress);
+  window.addEventListener('load', ()=>{
+    loadTheme();
+    updateInsurance();
+    updateWarehouse();
+    renderQuiz();
+    updateProgress();
+  });
+</script>
+</body>
+</html>
