@@ -437,7 +437,7 @@
         <p class="mini">Biết rằng mỗi kết quả của phép thử được gán với một giá trị số.</p>
       </div>
       <div class="card">
-        <strong>2. Tính \(P(X=x)\)</strong>
+        <strong>2. Tính \(P(X=x_i)\)</strong>
         <p class="mini">Xác định xác suất để biến ngẫu nhiên nhận một giá trị cụ thể.</p>
       </div>
       <div class="card">
@@ -569,16 +569,16 @@
     <span class="pill">HOẠT ĐỘNG TƯƠNG TÁC 2</span>
     <h2>Chọn sản phẩm từ kho</h2>
     <p class="section-intro">
-      Trong kho có \(a\) sản phẩm xấu và \(b\) sản phẩm tốt. Chọn ngẫu nhiên không hoàn lại \(k\) sản phẩm.
-      Gọi \(X\) là số sản phẩm tốt trong \(k\) sản phẩm được chọn.
+      Trong kho có \(a\) sản phẩm xấu và \(b\) sản phẩm tốt. Chọn ngẫu nhiên không hoàn lại \(n\) sản phẩm.
+      Gọi \(X\) là số sản phẩm tốt trong \(n\) sản phẩm được chọn.
     </p>
 
     <div class="formula">
-      Nếu \(X=x\), ta cần chọn \(x\) sản phẩm tốt từ \(b\) sản phẩm tốt và chọn
-      \(k-x\) sản phẩm xấu từ \(a\) sản phẩm xấu:
+      Nếu \(X=k\), ta cần chọn \(k\) sản phẩm tốt từ \(b\) sản phẩm tốt và chọn
+      \(n-k\) sản phẩm xấu từ \(a\) sản phẩm xấu:
       \[
-      P(X=x)=\frac{\mathrm{C}_{b}^{x}\,\mathrm{C}_{a}^{\,k-x}}
-      {\mathrm{C}_{a+b}^{k}}.
+      P(X=k)=\frac{\mathrm{C}_{b}^{k}\,\mathrm{C}_{a}^{\,n-k}}
+      {\mathrm{C}_{a+b}^{n}}.
       \]
     </div>
 
@@ -592,7 +592,7 @@
         <input id="wh_b" type="number" min="0" step="1" value="6">
       </label>
       <label>
-        Số sản phẩm lấy ra \(k\)
+        Số sản phẩm lấy ra \(n\)
         <input id="wh_k" type="number" min="0" step="1" value="3">
       </label>
     </div>
@@ -603,10 +603,10 @@
     <div class="table-wrap">
       <table id="wh_table">
         <thead>
-          <tr id="wh_head"><th>\(x\)</th></tr>
+          <tr id="wh_head"><th>\(k\)</th></tr>
         </thead>
         <tbody>
-          <tr id="wh_prob"><th>\(P(X=x)\)</th></tr>
+          <tr id="wh_prob"><th>\(P(X=k)\)</th></tr>
         </tbody>
       </table>
     </div>
@@ -798,7 +798,7 @@
     <h2>4 ý quan trọng</h2>
     <div class="grid-2">
       <div class="card"><strong>Biến ngẫu nhiên</strong> gán mỗi kết quả của phép thử với một số thực.</div>
-      <div class="card"><strong>\(P(X=x)\)</strong> là xác suất biến ngẫu nhiên nhận giá trị \(x\).</div>
+      <div class="card"><strong>\(P(X=k)\)</strong> là xác suất biến ngẫu nhiên nhận giá trị \(x\).</div>
       <div class="card"><strong>Bảng phân phối</strong> liệt kê các giá trị của \(X\) cùng xác suất tương ứng.</div>
       <div class="card"><strong>Kỳ vọng – phương sai – độ lệch chuẩn</strong> mô tả vị trí trung tâm và mức phân tán của phân phối.</div>
     </div>
@@ -945,7 +945,7 @@
     const head = document.getElementById('wh_head');
     const prob = document.getElementById('wh_prob');
     head.innerHTML = '<th>\\(x\\)</th>';
-    prob.innerHTML = '<th>\\(P(X=x)\\)</th>';
+    prob.innerHTML = '<th>\\(P(X=k)\\)</th>';
 
     xs.forEach((x,i)=>{
       const th = document.createElement('th');
@@ -1000,15 +1000,15 @@
       explain:"Các biến cố X=x_i tạo thành các khả năng đầy đủ nên tổng xác suất bằng 1."
     },
     {
-      q:"Trong kho có a sản phẩm xấu, b sản phẩm tốt, lấy k sản phẩm. Gọi X là số sản phẩm tốt được lấy. Công thức đúng cho P(X=x) là:",
+      q:"Trong kho có a sản phẩm xấu, b sản phẩm tốt, lấy n sản phẩm. Gọi X là số sản phẩm tốt được lấy. Công thức đúng cho P(X=k) là:",
       options:[
-        "\\(\\frac{\\mathrm{C}_{a}^{x}\\,\\mathrm{C}_{b}^{k-x}}{\\mathrm{C}_{a+b}^{k}}\\)",
-        "\\(\\frac{\\mathrm{C}_{b}^{x}\\,\\mathrm{C}_{a}^{k-x}}{\\mathrm{C}_{a+b}^{k}}\\)",
-        "\\(\\frac{\\mathrm{C}_{k}^{x}}{\\mathrm{C}_{a+b}^{x}}\\)",
+        "\\(\\frac{\\mathrm{C}_{a}^{x}\\,\\mathrm{C}_{b}^{n-k}}{\\mathrm{C}_{a+b}^{n}}\\)",
+        "\\(\\frac{\\mathrm{C}_{b}^{x}\\,\\mathrm{C}_{a}^{n-k}}{\\mathrm{C}_{a+b}^{n}}\\)",
+        "\\(\\frac{\\mathrm{C}_{k}^{x}}{\\mathrm{C}_{a+b}^{k}}\\)",
         "\\(\\frac{x}{a+b}\\)"
       ],
       correct:1,
-      explain:"Có \(\mathrm{C}_{b}^{x}\) cách chọn \(x\) sản phẩm tốt và \(\mathrm{C}_{a}^{k-x}\) cách chọn \(k-x\) sản phẩm xấu; tổng số cách chọn \(k\) sản phẩm từ kho là \(\mathrm{C}_{a+b}^{k}\)."
+      explain:"Có \(\mathrm{C}_{b}^{k}\) cách chọn \(k\) sản phẩm tốt và \(\mathrm{C}_{a}^{n-k}\) cách chọn \(n-k\) sản phẩm xấu; tổng số cách chọn \(n\) sản phẩm từ kho là \(\mathrm{C}_{a+b}^{n}\)."
     },
     {
       q:"Công thức nào đúng cho độ lệch chuẩn của X?",
